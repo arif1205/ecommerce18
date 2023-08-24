@@ -1,21 +1,21 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
-  Button,
-  Card,
-  Col,
-  ListGroup,
-  ListGroupItem,
-  Row,
-  Form,
-  Table,
-  Alert
+	Button,
+	Card,
+	Col,
+	ListGroup,
+	ListGroupItem,
+	Row,
+	Form,
+	Table,
+	Alert,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  deliverOrder,
-  getOrderSupplierPaymentDetails,
-  payOrderSupplier,
+	deliverOrder,
+	getOrderSupplierPaymentDetails,
+	payOrderSupplier,
 } from "../actions/orderActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
@@ -26,220 +26,228 @@ import axios from "axios";
 // if deliveryRequest is successul then deliver to user
 
 const OrderSupplierPaymentScreen = () => {
-  const [order, setOrder] = useState({});
+	const [order, setOrder] = useState({});
 
-  const { id: orderId } = useParams();
+	const { id: orderId } = useParams();
 
-  console.log("eta orderId", orderId);
-  console.log("eta order", order);
+	console.log("eta orderId", orderId);
+	console.log("eta order", order);
 
-  const [BankPin, setPin] = useState('')
-  const [InvalidPinMessage, setInvalidPinMessage] = useState(false)
-  const [PinMessage,setPinMessage] = useState('')
-  
-  const navigate = useNavigate();
+	const [BankPin, setPin] = useState("");
+	const [InvalidPinMessage, setInvalidPinMessage] = useState(false);
+	const [PinMessage, setPinMessage] = useState("");
 
-  const dispatch = useDispatch();
+	const navigate = useNavigate();
 
-  // this state is for loading the supplier payment table
-  const orderSupplierPayDetails = useSelector(
-    (state) => state.orderSupplierPayDetails
-  );
-  const {
-    loading: loadingSupplierPayDetails,
-    data: dataSupplierPayDetails,
-    error: errorSupplierPayDetails,
-  } = orderSupplierPayDetails;
+	const dispatch = useDispatch();
 
-  // this state is for loading the payment to supplier button
-  const orderSupplierPay = useSelector((state) => state.orderSupplierPay);
-  const {
-    loading: loadingSupplierPay,
-    // supplierPaymentResult sent bynk to ecommerce is stored here
-    supplierPay: supplierPaymentResultListObject,
-    error: errorSupplierPay,
-    success: successSupplierPay,
-  } = orderSupplierPay;
+	// this state is for loading the supplier payment table
+	const orderSupplierPayDetails = useSelector(
+		(state) => state.orderSupplierPayDetails
+	);
+	const {
+		loading: loadingSupplierPayDetails,
+		data: dataSupplierPayDetails,
+		error: errorSupplierPayDetails,
+	} = orderSupplierPayDetails;
 
-  const userLogin = useSelector((state) => state.userLogin);
-  const { userInfo } = userLogin;
+	// this state is for loading the payment to supplier button
+	const orderSupplierPay = useSelector((state) => state.orderSupplierPay);
+	const {
+		loading: loadingSupplierPay,
+		// supplierPaymentResult sent bynk to ecommerce is stored here
+		supplierPay: supplierPaymentResultListObject,
+		error: errorSupplierPay,
+		success: successSupplierPay,
+	} = orderSupplierPay;
 
-  // to get the order supplier payment status
-  const getOrderDetails = useCallback(async () => {
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userInfo.token}`,
-      },
-    };
+	const userLogin = useSelector((state) => state.userLogin);
+	const { userInfo } = userLogin;
 
-    try {
-      const isOrderResponse = axios.get(`/api/orders/${orderId}`, config);
+	// to get the order supplier payment status
+	const getOrderDetails = useCallback(async () => {
+		const config = {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${userInfo.token}`,
+			},
+		};
 
-      console.log("isOrderResponsethen er age");
+		try {
+			const isOrderResponse = axios.get(`/api/orders/${orderId}`, config);
 
-      isOrderResponse.then(function (result) {
-        console.log("isOrderResponse then er pore");
-        const order = result.data;
-        console.log("eta then  er pore result data", result.data);
-        console.log("eta order", order);
-        setOrder(order);
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }, [orderId, userInfo.token]);
+			console.log("isOrderResponsethen er age");
 
-  ////////////////////////////
+			isOrderResponse.then(function (result) {
+				console.log("isOrderResponse then er pore");
+				const order = result.data;
+				console.log("eta then  er pore result data", result.data);
+				console.log("eta order", order);
+				setOrder(order);
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	}, [orderId, userInfo.token]);
 
-  // function for sending api request to supplier with delivery request
-  const deliveryRequestToSuppliers = useCallback(
-    async (order, supplierPaymentResultList) => {
-      try {
-        const config = {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        };
+	////////////////////////////
 
-        console.log(
-          "eta deliveryRequest er vetor supplierPaymentResultList",
-          supplierPaymentResultList
-        );
-        // send delivery request to supplier api
-        const isDeliveryRequestSuccessfulResponse = axios.post(
-          `/supplierapi/deliveryRequests`,
-          supplierPaymentResultList,
-          config
-        );
+	// function for sending api request to supplier with delivery request
+	const deliveryRequestToSuppliers = useCallback(
+		async (order, supplierPaymentResultList) => {
+			try {
+				const config = {
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${userInfo.token}`,
+					},
+				};
 
-        console.log("eta .then er age ", isDeliveryRequestSuccessfulResponse);
+				console.log(
+					"eta deliveryRequest er vetor supplierPaymentResultList",
+					supplierPaymentResultList
+				);
+				// send delivery request to supplier api
+				const isDeliveryRequestSuccessfulResponse = axios.post(
+					`/supplierapi/deliveryRequests`,
+					supplierPaymentResultList,
+					config
+				);
 
-        isDeliveryRequestSuccessfulResponse.then(function (result) {
-          const isDeliveryRequestSuccessful =
-            result.data.isDeliveryRequestSuccessful;
+				console.log("eta .then er age ", isDeliveryRequestSuccessfulResponse);
 
-          if (isDeliveryRequestSuccessful) {
-            if (!order.isDeliverd) dispatch(deliverOrder(order));
-          }
-        });
-      } catch (error) {}
-    },
+				isDeliveryRequestSuccessfulResponse.then(function (result) {
+					const isDeliveryRequestSuccessful =
+						result.data.isDeliveryRequestSuccessful;
 
-    [dispatch, userInfo.token]
-  );
+					if (isDeliveryRequestSuccessful) {
+						if (!order.isDeliverd) dispatch(deliverOrder(order));
+					}
+				});
+			} catch (error) {}
+		},
 
-  // send delivery request after paying supplier
-  if (successSupplierPay) {
-    console.log("delivery request je order ke dicchi", order);
-    if (!order.isDeliverd)
-      deliveryRequestToSuppliers(order, supplierPaymentResultListObject);
-  }
+		[dispatch, userInfo.token]
+	);
 
-  /////////////////////////////////
+	// send delivery request after paying supplier
+	if (successSupplierPay) {
+		console.log("delivery request je order ke dicchi", order);
+		if (!order.isDeliverd)
+			deliveryRequestToSuppliers(order, supplierPaymentResultListObject);
+	}
 
-  useEffect(() => {
-    if (!userInfo || !userInfo.isAdmin) {
-      navigate("/login");
-    }
-  }, [navigate, userInfo]);
+	/////////////////////////////////
 
-  useEffect(() => {
-    getOrderDetails();
-    dispatch(getOrderSupplierPaymentDetails(orderId));
+	useEffect(() => {
+		if (!userInfo || !userInfo.isAdmin) {
+			navigate("/login");
+		}
+	}, [navigate, userInfo]);
 
-    console.log("inside second useEffect");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+	useEffect(() => {
+		getOrderDetails();
+		dispatch(getOrderSupplierPaymentDetails(orderId));
 
-  const payOrderSupplierHandler = () => {
-    if (!order?.isSupplierPaid) {
-      dispatch(payOrderSupplier(orderId, dataSupplierPayDetails, BankPin));
-    }
-  };
+		console.log("inside second useEffect");
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
-  return (
-    <>
-      <h1>Order {orderId} - Supplier Payment</h1>
-      {loadingSupplierPayDetails ? (
-        <Loader />
-      ) : errorSupplierPayDetails ? (
-        <Message variant="danger">{errorSupplierPayDetails}</Message>
-      ) : (
-        <Table striped bordered hover responsive className="table-sm">
-          <thead>
-            <tr>
-              <th>SUPPLIER NAME</th>
-              <th>SUPPLIER EMAIL</th>
-              <th>SUPPLIER BANK ACCOUNT</th>
-              <th>AMOUNT</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dataSupplierPayDetails &&
-              dataSupplierPayDetails.map((supplier) => (
-                <tr key={supplier.bankAccount}>
-                  <td>{supplier.name}</td>
-                  <td>{supplier.email}</td>
-                  <td>{supplier.bankAccount}</td>
-                  <td>${supplier.amount}</td>
-                </tr>
-              ))}
-          </tbody>
-        </Table>
-      )}
+	const payOrderSupplierHandler = () => {
+		if (!order?.isSupplierPaid) {
+			dispatch(payOrderSupplier(orderId, dataSupplierPayDetails, BankPin));
+		}
+	};
 
-      {/* payment button */}
+	return (
+		<div className='w-75 mx-auto'>
+			<h1>Order id: {orderId}</h1>
 
-      {loadingSupplierPayDetails ? (
-        <></>
-      ) : loadingSupplierPay ? (
-        <Loader />
-      ) : errorSupplierPay ? (
-        <>
-          <Message variant="danger">{errorSupplierPay}</Message>
-          <Form >
-          
-            <Form.Group controlId='BankPin'>
-                <Form.Control type='password' placeholder='Enter PIN' value={BankPin} onChange={(e) => setPin(e.target.value)}>
-                </Form.Control>
-            </Form.Group>
-          </Form>
+			<Table striped bordered hover responsive className='table-sm text-black'>
+				<thead>
+					<tr>
+						<th>SUPPLIER NAME</th>
+						<th>SUPPLIER EMAIL</th>
+						<th>SUPPLIER BANK ACCOUNT</th>
+						<th>AMOUNT</th>
+					</tr>
+				</thead>
+				<tbody className='!text-black'>
+					{dataSupplierPayDetails &&
+						dataSupplierPayDetails.map((supplier) => (
+							<tr key={supplier.bankAccount}>
+								<td>{supplier.name}</td>
+								<td>{supplier.email}</td>
+								<td>{supplier.bankAccount}</td>
+								<td>BDT. {supplier.amount}</td>
+							</tr>
+						))}
+				</tbody>
+			</Table>
 
-          <Button
-            variant="primary"
-            className="btn-sm"
-            onClick={() => payOrderSupplierHandler()}
-          >
-            Pay Now
-          </Button>
-        </>
-      ) : order?.isSupplierPaid || successSupplierPay ? (
-        <Alert key={"success"} variant={"success"}>
-          Paid
-        </Alert>
-      ) : (
-        <>
-        <Form >
-        
-          <Form.Group controlId='BankPin'>
-              <Form.Control type='password' placeholder='Enter PIN' value={BankPin} onChange={(e) => setPin(e.target.value)}>
-              </Form.Control>
-          </Form.Group>
-        </Form>
+			{/* payment button */}
 
-        <Button
-          variant="primary"
-          className="btn-sm"
-          onClick={() => payOrderSupplierHandler()}
-        >
-          Pay Now
-        </Button>
-        </>
-      )}
-    </>
-  );
+			{loadingSupplierPayDetails ? (
+				<></>
+			) : loadingSupplierPay ? (
+				<Loader />
+			) : errorSupplierPay ? (
+				<>
+					<Form>
+						<div className='flex gap-2 items-center'>
+							<label htmlFor='PIN' className='font-[600] min-w-[120px]'>
+								PIN:{" "}
+							</label>
+							<input
+								type='text'
+								placeholder='Enter PIN'
+								value={BankPin}
+								id='PIN'
+								name='PIN'
+								className='bg-slate-200 px-4 py-1 rounded-xl focus:outline-none'
+								required
+								onChange={(e) => setPin(e.target.value)}
+							/>
+						</div>
+					</Form>
+
+					<Button
+						variant=''
+						className='btn-sm !bg-green text-white'
+						onClick={() => payOrderSupplierHandler()}>
+						Pay Now
+					</Button>
+				</>
+			) : order?.isSupplierPaid || successSupplierPay ? (
+				<div className='text-green font-bold'>Paid</div>
+			) : (
+				<>
+					<div className='flex gap-2 items-center'>
+						<label htmlFor='PIN' className='font-[600] min-w-[120px]'>
+							PIN:{" "}
+						</label>
+						<input
+							type='password'
+							placeholder='Enter PIN'
+							value={BankPin}
+							id='PIN'
+							name='PIN'
+							className='bg-slate-200 px-4 py-1 rounded-xl focus:outline-none'
+							required
+							onChange={(e) => setPin(e.target.value)}
+						/>
+					</div>
+
+					<Button
+						variant=''
+						className='btn-sm !bg-green text-white mt-4'
+						onClick={() => payOrderSupplierHandler()}>
+						Pay Now
+					</Button>
+				</>
+			)}
+		</div>
+	);
 };
 
 export default OrderSupplierPaymentScreen;

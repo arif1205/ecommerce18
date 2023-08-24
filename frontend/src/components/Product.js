@@ -4,30 +4,19 @@ import { Link } from "react-router-dom";
 import Rating from "./Rating";
 
 const Product = ({ product }) => {
-  return (
-    <Card className="my-3 p-3 rounded">
-      <Link to={`/product/${product._id}`}>
-        <Card.Img src={product.image} variant="top" />
-      </Link>
+	return (
+		<div className='rounded px-4'>
+			<img src={product.image} alt='product' />
 
-      <Card.Body>
-        <Link to={`/product/${product._id}`}>
-          <Card.Title as="div">
-            <strong>{product.name}</strong>
-          </Card.Title>
-        </Link>
+			<div className='text-center py-2 px-4 shadow-sm'>
+				<div className='text-slate-800 hover:text-green duration-200'>
+					<strong>{product.name}</strong>
+				</div>
 
-        <Card.Text as="div">
-          <Rating
-            value={product.rating}
-            text={`${product.numReviews} reviews`}
-          />
-        </Card.Text>
-
-        <Card.Text as="h3">${product.price}</Card.Text>
-      </Card.Body>
-    </Card>
-  );
+				<p>BDT. {product.price}</p>
+			</div>
+		</div>
+	);
 };
 
 export default Product;

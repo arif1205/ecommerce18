@@ -121,184 +121,65 @@ const OrderScreen = () => {
 		}
 	};
 
-	// const deliverHandler = () => {
-	//   dispatch(deliverOrder(order));
-	// };
-
-	const invoiceHandler = async () => {
-		try {
-			const invoicedata = {
-				orderlist: order,
-			};
-
-			const invoiceRouteCall = axios.post(`/api/invoice`, invoicedata);
-			console.log("invoice promise er age:" + invoiceRouteCall);
-
-			invoiceRouteCall.then(function (result) {
-				console.log("invoice ekhane bank_api: " + result.data.message);
-				console.log("hoise mama");
-				window.open(
-					"http://localhost:3000/invoices/" + order._id + ".pdf",
-					"_blank"
-				);
-			});
-		} catch (error) {
-			console.log("invoice: " + error);
-		}
-	};
-
 	return loading ? (
 		<Loader />
 	) : error ? (
 		<Message variant='danger'>{error}</Message>
 	) : (
 		<>
-			<h1>Order {order._id}</h1>
-			<Row>
+			<h1 className='text-center'>
+				<span className='text-green'>Order id: </span>
+				{order._id}
+			</h1>
+			<Row className='justify-content-center'>
 				<Col md={8}>
 					<ListGroup variant='flush'>
-						<ListGroup.Item>
-							<h2>Shipping</h2>
-							<p>
-								<strong>Name: </strong> {order.user.name}
-							</p>
-							<p>
-								<strong>Email: </strong>{" "}
-								<a href={`mailto:${order.user.email}`}>{order.user.email}</a>
-							</p>
-							<p>
-								<strong>Address:</strong>
-								{order.shippingAddress.address}, {order.shippingAddress.city}{" "}
-								{order.shippingAddress.postalCode},{" "}
-								{order.shippingAddress.country}
-							</p>
-							{order.isDelivered ? (
-								<Message variant='success'>
-									Delivered on {order.deliveredAt}
-								</Message>
-							) : (
-								<Message variant='danger'>Not Delivered</Message>
-							)}
-						</ListGroup.Item>
-
-						<ListGroup.Item>
-							<h2>Payment Method</h2>
-							<p>
-								<strong>Method: </strong>
-								{order.paymentMethod}
-							</p>
+						<ListGroup.Item className='mx-auto'>
 							{order.isPaid ? (
-								<Message variant='success'>Paid on {order.paidAt}</Message>
+								<button className='btn btn-danger !bg-green !border-green'>
+									Paid
+								</button>
 							) : (
-								<Message variant='danger'>Not Paid</Message>
-							)}
-						</ListGroup.Item>
-
-						<ListGroup.Item>
-							<h2>Order Items</h2>
-							{order.orderItems.length === 0 ? (
-								<Message>Order is empty</Message>
-							) : (
-								<ListGroup variant='flush'>
-									{order.orderItems.map((item, index) => (
-										<ListGroup.Item key={index}>
-											<Row>
-												<Col md={1}>
-													<Image
-														src={item.image}
-														alt={item.name}
-														fluid
-														rounded
-													/>
-												</Col>
-												<Col>
-													<Link to={`/product/${item.product}`}>
-														{item.name}
-													</Link>
-												</Col>
-												<Col md={4}>
-													{item.qty} x ${item.price} = ${item.qty * item.price}
-												</Col>
-											</Row>
-										</ListGroup.Item>
-									))}
-								</ListGroup>
+								<button className='btn btn-danger !bg-red-500 !border-red-500'>
+									Not Paid
+								</button>
 							)}
 						</ListGroup.Item>
 					</ListGroup>
-				</Col>
-				<Col md={4}>
-					<Card className='mb-2'>
-						<ListGroup variant='flush'>
-							<ListGroup.Item>
-								<h2>Order Summary</h2>
-							</ListGroup.Item>
-							<ListGroup.Item>
-								<Row>
-									<Col>Items</Col>
-									<Col>${order.itemsPrice}</Col>
-								</Row>
-							</ListGroup.Item>
-							<ListGroup.Item>
-								<Row>
-									<Col>Shipping</Col>
-									<Col>${order.shippingPrice}</Col>
-								</Row>
-							</ListGroup.Item>
-							<ListGroup.Item>
-								<Row>
-									<Col>Tax</Col>
-									<Col>${order.taxPrice}</Col>
-								</Row>
-							</ListGroup.Item>
-							<ListGroup.Item>
-								<Row>
-									<Col>Total</Col>
-									<Col>${order.totalPrice}</Col>
-								</Row>
-							</ListGroup.Item>
-						</ListGroup>
+
+					<div className='mb-2 w-50 mx-auto'>
+						<p className='text-2xl text-center'>
+							Total amount:{" "}
+							<span className='bg-slate-300 text-red-500 px-2 py-1 rounded-lg'>
+								{order.totalPrice}
+							</span>
+						</p>
+
 						{!order.isPaid && (
-							<ListGroup.Item>
-								<Form>
-									<Form.Group controlId='BankPin'>
-										<Form.Control
-											type='password'
-											placeholder='Enter PIN'
-											value={BankPin}
-											onChange={(e) => setPin(e.target.value)}></Form.Control>
-									</Form.Group>
-								</Form>
-							</ListGroup.Item>
+							<div className='flex align-items-center justify-content-center'>
+								<input
+									type='password'
+									className='bg-slate-300 px-4 py-1 w-full max-w-[150px] mb-4 rounded-xl text-red-500'
+									placeholder='Enter your PIN'
+									value={BankPin}
+									onChange={(event) => {
+										setPin(event.target.value);
+									}}
+								/>
+							</div>
 						)}
 						{!order.isPaid && (
-							<ListGroup.Item>
-								{loadingPay && <Loader />}
-								<Button
-									type='button'
-									className='btn-block col-12'
+							<div className='flex justify-content-center align-items-center'>
+								<button
+									className='btn btn-danger !bg-green !border-green mx-auto w-[100px]'
 									onClick={payNowHandler}>
-									Pay Now
-								</Button>
-							</ListGroup.Item>
+									Pay
+								</button>
+							</div>
 						)}
 
 						{loadingDeliver && <Loader />}
-						{userInfo && order.isPaid && (
-							<ListGroup.Item>
-								<Button
-									type='button'
-									className='btn-block col-12'
-									onClick={invoiceHandler}>
-									View Invoice
-								</Button>
-							</ListGroup.Item>
-						)}
-					</Card>
-
-					{InvalidPinMessage && (
-						<Message variant='danger'>{PinMessage}</Message>
-					)}
+					</div>
 				</Col>
 			</Row>
 		</>
