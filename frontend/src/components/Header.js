@@ -130,16 +130,20 @@ const Header = () => {
 									Orders
 								</div>
 							</LinkContainer>
-							<LinkContainer to='/admin/userList'>
-								<div className='text-xl uppercase font-medium cursor-pointer pb-1 border-b-[3px] border-transparent hover:border-green hover:text-green duration-200'>
-									All users
-								</div>
-							</LinkContainer>
-							<LinkContainer to='/admin/orderList'>
-								<div className='text-xl uppercase font-medium cursor-pointer pb-1 border-b-[3px] border-transparent hover:border-green hover:text-green duration-200'>
-									All Orders
-								</div>
-							</LinkContainer>
+							{userInfo?.isAdmin && (
+								<>
+									<LinkContainer to='/admin/userList'>
+										<div className='text-xl uppercase font-medium cursor-pointer pb-1 border-b-[3px] border-transparent hover:border-green hover:text-green duration-200'>
+											All users
+										</div>
+									</LinkContainer>
+									<LinkContainer to='/admin/orderList'>
+										<div className='text-xl uppercase font-medium cursor-pointer pb-1 border-b-[3px] border-transparent hover:border-green hover:text-green duration-200'>
+											All Orders
+										</div>
+									</LinkContainer>
+								</>
+							)}
 						</div>
 						{/* right  */}
 						<div className='flex gap-4 items-center'>
@@ -152,11 +156,19 @@ const Header = () => {
 								{cartItems.length})
 							</div>
 
-							<div
-								className='text-xl uppercase font-medium cursor-pointer pb-1 border-b-[3px] border-transparent hover:border-green hover:text-green duration-200'
-								onClick={logoutHandler}>
-								Logout
-							</div>
+							{userInfo ? (
+								<div
+									className='text-xl uppercase font-medium cursor-pointer pb-1 border-b-[3px] border-transparent hover:border-green hover:text-green duration-200'
+									onClick={logoutHandler}>
+									Logout
+								</div>
+							) : (
+								<LinkContainer to='/login'>
+									<div className='text-xl uppercase font-medium cursor-pointer pb-1 border-b-[3px] border-transparent hover:border-green hover:text-green duration-200'>
+										Sign In
+									</div>
+								</LinkContainer>
+							)}
 						</div>
 					</div>
 				</div>

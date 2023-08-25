@@ -5,46 +5,37 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../actions/userActions";
 
 const Header = () => {
-  const dispatch = useDispatch();
+	const dispatch = useDispatch();
 
-  const userLogin = useSelector((state) => state.userLogin);
-  const { userInfo } = userLogin;
+	const userLogin = useSelector((state) => state.userLogin);
+	const { userInfo } = userLogin;
 
-  const logoutHandler = () => {
-    dispatch(logout());
-  };
-  return (
-    <header>
-      <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
-        <Container>
-          <LinkContainer to="/">
-            <Navbar.Brand>Sust Bank</Navbar.Brand>
-          </LinkContainer>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
-              {userInfo ? (
-                <NavDropdown title={userInfo.name} id="username">
-                  <LinkContainer to="/profile">
-                    <NavDropdown.Item>Profile</NavDropdown.Item>
-                  </LinkContainer>
-                  <NavDropdown.Item onClick={logoutHandler}>
-                    Logout
-                  </NavDropdown.Item>
-                </NavDropdown>
-              ) : (
-                <LinkContainer to="/login">
-                  <Nav.Link>
-                    <i className="fas fa-user"></i> Sign In
-                  </Nav.Link>
-                </LinkContainer>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-    </header>
-  );
+	const logoutHandler = () => {
+		dispatch(logout());
+	};
+	return (
+		<header>
+			<Navbar expand='lg' className='bg-body-tertiary'>
+				<Container>
+					<Navbar.Brand href='#home'>Ecom-Bank</Navbar.Brand>
+					<Navbar.Toggle aria-controls='basic-navbar-nav' />
+					<Navbar.Collapse id='basic-navbar-nav'>
+						<Nav className='me-auto'>
+							{userInfo ? (
+								<>
+									<Nav.Link href='/'>Home</Nav.Link>
+									<Nav.Link href='/profile'>Profile</Nav.Link>
+									<Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
+								</>
+							) : (
+								<Nav.Link href='/login'>Login</Nav.Link>
+							)}
+						</Nav>
+					</Navbar.Collapse>
+				</Container>
+			</Navbar>
+		</header>
+	);
 };
 
 export default Header;
